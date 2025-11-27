@@ -1,0 +1,4 @@
+streamlit
+pandas
+plotly
+# 任何其他您使用的库，例如 numpy
