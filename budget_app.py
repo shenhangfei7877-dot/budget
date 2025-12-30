@@ -348,14 +348,6 @@ if uploaded_file is not None:
         # --- 顶部标题区 ---
         st.title(f"{selected_company}")
         st.markdown("2026年全面预算概览")
-
-        st.markdown("<h2 style='font-size:1.9rem; font-weight:bold;'> 2026年预算执行小结</h2>", unsafe_allow_html=True)
-        summary_text = row.get('小结', '暂无小结')
-        st.markdown(f"<div class='summary-box' style='font-size:1.3rem; line-height:2;'>{format_text_list(summary_text, color='#1f1f1f')}</div>", unsafe_allow_html=True)
-
-        st.markdown("<h2 style='font-size:1.9rem; font-weight:bold;'> 提请管理层关注</h2>", unsafe_allow_html=True)
-        attention_text = row.get('提请管理层关注', '无')
-        st.markdown(f"<div class='attention-box' style='font-size:1.2rem; line-height:2;'>{format_text_list(attention_text, color='#d46b08')}</div>", unsafe_allow_html=True)
         
         # --- 第一部分：核心指标 ---
         # 数据提取
@@ -426,6 +418,16 @@ if uploaded_file is not None:
             st.markdown(f"###  2026年综合毛利率") 
             st.markdown(f"<div style='font-size:1.8rem; font-weight:bold; margin:10px 0; color:#0052cc;'>{margin_26_str}</div>", unsafe_allow_html=True)
             st.markdown(f"<div style='font-size:1.1rem; font-weight:bold; color:#333; margin-bottom:5px;'>2025年：{margin_25_str}</div>", unsafe_allow_html=True)
+
+        st.markdown("---")
+
+        st.markdown("<h2 style='font-size:1.9rem; font-weight:bold;'> 2026年预算执行小结</h2>", unsafe_allow_html=True)
+        summary_text = row.get('小结', '暂无小结')
+        st.markdown(f"<div class='summary-box' style='font-size:1.3rem; line-height:2;'>{format_text_list(summary_text, color='#1f1f1f')}</div>", unsafe_allow_html=True)
+
+        st.markdown("<h2 style='font-size:1.9rem; font-weight:bold;'> 提请管理层关注</h2>", unsafe_allow_html=True)
+        attention_text = row.get('提请管理层关注', '无')
+        st.markdown(f"<div class='attention-box' style='font-size:1.2rem; line-height:2;'>{format_text_list(attention_text, color='#d46b08')}</div>", unsafe_allow_html=True)
 
         st.markdown("---")
 
