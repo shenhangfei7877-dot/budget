@@ -321,15 +321,41 @@ if uploaded_file is not None:
     df = load_data(uploaded_file)
     
     if df is not None:
-        companies = df['公司简称'].unique().tolist()
-        selected_company = st.sidebar.selectbox("选择公司主体", companies)
+        search_query = st.sidebar.text_input("搜索序号或公司简称")
+        if search_query and str(search_query).strip() != "":
+            q = str(search_query).strip()
+            mask_name = df['公司简称'].astype(str).str.contains(q, case=False, na=False)
+            mask_no = df['序号'].astype(str).str.contains(q, na=False) if '序号' in df.columns else False
+            df_view = df[mask_name | mask_no]
+            st.sidebar.info(f"匹配到 {len(df_view)} 条")
+        else:
+            df_view = df
+
+        companies = df_view['公司简称'].unique().tolist()
+        if len(companies) == 0:
+            st.sidebar.warning("未找到匹配项")
+            df_view = df
+            companies = df['公司简称'].unique().tolist()
+
+        selected_company = st.sidebar.selectbox("选择公司主体", companies, index=None, placeholder="请选择公司")
+        if selected_company is None:
+            st.info("在左侧输入搜索并选择公司后显示")
+            st.stop()
         
         # 获取选中行数据
-        row = df[df['公司简称'] == selected_company].iloc[0]
+        row = df_view[df_view['公司简称'] == selected_company].iloc[0]
         
         # --- 顶部标题区 ---
         st.title(f"{selected_company}")
         st.markdown("2026年全面预算概览")
+
+        st.markdown("<h2 style='font-size:1.9rem; font-weight:bold;'> 2026年预算执行小结</h2>", unsafe_allow_html=True)
+        summary_text = row.get('小结', '暂无小结')
+        st.markdown(f"<div class='summary-box' style='font-size:1.3rem; line-height:2;'>{format_text_list(summary_text, color='#1f1f1f')}</div>", unsafe_allow_html=True)
+
+        st.markdown("<h2 style='font-size:1.9rem; font-weight:bold;'> 提请管理层关注</h2>", unsafe_allow_html=True)
+        attention_text = row.get('提请管理层关注', '无')
+        st.markdown(f"<div class='attention-box' style='font-size:1.2rem; line-height:2;'>{format_text_list(attention_text, color='#d46b08')}</div>", unsafe_allow_html=True)
         
         # --- 第一部分：核心指标 ---
         # 数据提取
@@ -831,18 +857,7 @@ if uploaded_file is not None:
         # 资金缺口说明使用黑色字体
         st.markdown(f"<div style='color:#1f1f1f; font-size:1rem; background:#f0f5ff; padding:20px; border-radius:8px;'>{format_text_list(fund_note, color='#1f1f1f')}</div>", unsafe_allow_html=True)
 
-        # --- 第四部分：底部小结 ---
-        st.markdown("---")
-        st.markdown("<h3 style='font-size:1.5rem; font-weight:bold;'> 2026年预算执行小结</h3>", unsafe_allow_html=True)
-        summary_text = row.get('小结', '暂无小结')
-        # 小结部分使用黑色字体，按"1、2、3、"分段
-        st.markdown(f"<div style='font-size:1.1rem; line-height:1.8; color:#1f1f1f;'>{format_text_list(summary_text, color='#1f1f1f')}</div>", unsafe_allow_html=True)
-        
-        # --- 提请管理层关注 (放在预算小结下方) ---
-        st.markdown("---")
-        st.markdown("<h3 style='font-size:1.5rem; font-weight:bold;'> 提请管理层关注</h3>", unsafe_allow_html=True)
-        attention_text = row.get('提请管理层关注', '无')
-        st.markdown(f"<div class='attention-box'>{format_text_list(attention_text, color='#d46b08')}</div>", unsafe_allow_html=True)
+        # 顶部已展示小结与管理层关注
 
 else:
     st.info("请在左侧上传 Excel 文件 (2026预算小结.xlsx)")
